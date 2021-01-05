@@ -1,0 +1,12 @@
+body{
+    color:white;
+    background-color: #202020;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.table{
+    color:white
+}

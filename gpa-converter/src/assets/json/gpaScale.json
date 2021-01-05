@@ -1,0 +1,52 @@
+[
+    {
+        "letter": "A+",
+        "YorkGPA": 9,
+        "StandardGPA": 4.0
+    },
+    {
+        "letter": "A",
+        "YorkGPA": 8,
+        "StandardGPA": 3.8
+    },
+    {
+        "letter": "B+",
+        "YorkGPA": 7,
+        "StandardGPA": 3.3
+    },
+    {
+        "letter": "B",
+        "YorkGPA": 6,
+        "StandardGPA": 3.0
+    },
+    {
+        "letter": "C+",
+        "YorkGPA": 5,
+        "StandardGPA": 2.3
+    },
+    {
+        "letter": "C",
+        "YorkGPA": 4,
+        "StandardGPA": 2.0
+    },
+    {
+        "letter": "D+",
+        "YorkGPA": 3,
+        "StandardGPA": 1.3
+    },
+    {
+        "letter": "D",
+        "YorkGPA": 2,
+        "StandardGPA": 1.0
+    },
+    {
+        "letter": "E",
+        "YorkGPA": 1,
+        "StandardGPA": 0.7
+    },
+    {
+        "letter": "F",
+        "YorkGPA": 0,
+        "StandardGPA": 0.0
+    }
+]
