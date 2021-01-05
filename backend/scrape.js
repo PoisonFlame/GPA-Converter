@@ -44,7 +44,7 @@ app.post('/getGrades', async (req, res, next) => {
 
 
     const browser = await puppeteer.launch({
-        headless: true
+        headless: true, args: ['--no-sandbox']
     });
     const page = await browser.newPage();
     await page.goto('https://wrem.sis.yorku.ca/Apps/WebObjects/ydml.woa/wa/DirectAction/document?name=CourseListv1');
