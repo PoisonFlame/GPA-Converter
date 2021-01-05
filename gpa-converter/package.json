@@ -2,6 +2,7 @@
   "name": "gpa-converter",
   "proxy": "http://localhost:8888",
   "version": "0.1.0",
+  "author": "Rudra Sharma",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.8",
