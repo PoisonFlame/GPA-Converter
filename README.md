@@ -7,7 +7,7 @@ GPA Converter is an application written in NodeJS and ReactJS. The purpose of th
 - York GPA Import Functionality
 - Ability to add extra rows
 - Course Grade Calculator (to be implemented)
-- JSON based import/export of grade list for grade calculation (to be implemented)
+- JSON based import/export of grade list for grade calculation
 
 # Main Dependencies
 - Frontend
@@ -44,4 +44,12 @@ npm run serve
 To build the frontend (backend then can be ran separately by `node scrape.js` in backend dir)
 ```
 npm run build
+```
+
+# Docker Build
+
+Go to root folder where Dockerfile exists and run the following command to create an image with name gpa-converter
+
+```
+docker build -t gpa-converter .
 ```
