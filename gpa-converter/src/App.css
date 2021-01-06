@@ -10,3 +10,15 @@ body{
 .table{
     color:white
 }
+
+.alert{
+    position:fixed;
+    top:0;
+    right:0;
+    width:100%;
+}
+
+div[disabled] {
+    pointer-events: none;
+    opacity: 0.4;
+  }

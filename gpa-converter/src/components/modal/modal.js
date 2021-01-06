@@ -3,27 +3,17 @@ import Button from 'react-bootstrap/Button';
 import './modal.css';
 import Form from 'react-bootstrap/Form';
 import React, { Component } from "react";
-import Alert from 'react-bootstrap/Alert'
 import axios from 'axios';
 
 class YorkInfoModal extends Component{
   constructor(props) {
     super(props);
-    let {getGrades, ...newProps} = props;
+    let {getGrades,setAlert, ...newProps} = props;
     this.state = {
       user: "",
       pass: "",
-      props:newProps,
-      alertState: false,
-      alertType: "danger",
-      alertMessage: ""
+      props:newProps
     }
-
-  }
-
-  setAlert(state,message,type,duration){
-    this.setState({alertState: state,alertType: type,alertMessage:message});
-    setTimeout(() => {this.setState({alertState:false})},duration)
   }
 
   changeModalState(state){
@@ -35,25 +25,20 @@ class YorkInfoModal extends Component{
   scrapeData(){
     this.changeModalState(false);
     this.setState({user:"",pass:""});
-    this.setAlert(true,"Attempting to gather data. ETA:~6 Seconds.","warning",4000);
+    this.props.setAlert({state: true, message: "Attempting to gather data. Please Wait.", type: "warning", pageStateDisabled:true});
     axios.post(`getGrades`, { user: this.state.user, pass: this.state.pass })
       .then(res => {
         this.props.getGrades(res.data.gradeList);
-        this.setAlert(true,"Data importing successful.","success",2000);
+        this.props.setAlert({state: true, message: "Data importing successful.", type: "success", duration:2000, pageStateDisabled:false});
       })
       .catch(error => {
-        this.setAlert(true,"Error: " + error.response.data.Error,"danger",3000);
+        this.props.setAlert({state: true, message: "Error: " + error.response.data.Error, type: "danger", duration: 3000, pageStateDisabled:false});
       })
   }
-
-
 
 render() {
     return (
       <div>
-        <Alert show={this.state.alertState} variant={this.state.alertType} >
-          {this.state.alertMessage}
-        </Alert>
       <Modal
         {...this.state.props}
         size="lg"
