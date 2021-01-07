@@ -6,7 +6,7 @@ GPA Converter is an application written in NodeJS and ReactJS. The purpose of th
 - Automatic GPA calculation
 - York GPA Import Functionality
 - Ability to add extra rows
-- Course Grade Calculator (to be implemented)
+- Course Grade Calculator
 - JSON based import/export of grade list for grade calculation
 
 # Main Dependencies

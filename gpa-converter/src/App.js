@@ -3,18 +3,15 @@ import React, { Component } from "react";
 import logo from './assets/images/logo.png';
 import gpaScale from './assets/json/gpaScale.json';
 import exampleJSON from './assets/json/exampleJSON.json';
-import Table from 'react-bootstrap/Table'
-import Form from 'react-bootstrap/Form'
-import Button from 'react-bootstrap/Button'
-import Image from 'react-bootstrap/Image'
+import {Table, Form, Button, Image, Alert} from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import Alert from 'react-bootstrap/Alert'
 import YorkInfoModal from './components/modal/modal';
 import Files from "react-files";
 import Validator from 'jsonschema';
 import ReactTooltip from 'react-tooltip';
 import Switch from "react-switch";
+import gpaHelpers from './helpers/gpa/helper'
 
 class App extends Component {
   constructor(props) {
@@ -26,15 +23,6 @@ class App extends Component {
     let initList = [];
     let init4GPA = {};
     let init9GPA = {};
-
-    for (let x = 0; x < 5; x++) {
-      initList.push({
-        Session: '',
-        Course: '',
-        Grade: '',
-        Credits: ''
-      })
-    }
 
     for (let i = 0; i < gpaScale.length; i++) {
       init4GPA[gpaScale[i]['letter']] = gpaScale[i]["StandardGPA"];
@@ -48,9 +36,10 @@ class App extends Component {
       gpa9: 'N/A',
       grde: 'N/A',
       cred: 'N/A',
+      desiredGrade: 'Choose Grade',
       GPA4Scale: init4GPA,
       GPA9Scale: init9GPA,
-      list: initList,
+      list: gpaHelpers.generateBlankList(),
       modalShow: false,
       alertState: false,
       pageStateDisabled: false,
@@ -89,6 +78,11 @@ class App extends Component {
       let v = new Validator.Validator();
       let res = v.validate(JSON.parse(event.target.result.toString()), schema)
       if (res.valid === true) {
+        if(isNaN(JSON.parse(event.target.result.toString())[0].Grade)){
+          this.toggleView(true);
+        }else{
+          this.toggleView(false);
+        }
         // @ts-ignore
         this.setState({ list: JSON.parse(event.target.result) }, () => {
           this.setAlert({ state: true, type: "success", message: "Import successful.", duration: 3000 });
@@ -115,7 +109,7 @@ class App extends Component {
     this.setState({ list })
   }
 
-  updateInput(key, index, value) {
+  updateInput(key=null, index=null, value=null) {
     const list = [...this.state.list];
     let creds = 0.0;
     let total4GPA = 0;
@@ -216,7 +210,7 @@ class App extends Component {
   }
 
   exportList() {
-    this.download(JSON.stringify(this.state.list), 'grades[' + this.formatDate() + ']', 'application/json');
+    this.download(JSON.stringify(this.state.list), (this.state.gpaConverter ? 'gpa[' : 'grades[') + this.formatDate() + ']', 'application/json');
   }
 
   toggleView(state) {
@@ -324,6 +318,52 @@ class App extends Component {
     }
   }
 
+  calculateDesiredGrade(){
+    let desiredGrade = this.state.desiredGrade;
+    let numberGrade = 0;
+    if(desiredGrade === "A+"){
+      numberGrade = 90;
+    }else if(desiredGrade === "A"){
+      numberGrade = 80;
+    }else if(desiredGrade === "B+"){
+      numberGrade = 75;
+    }else if(desiredGrade === "B"){
+      numberGrade = 70;
+    }else if(desiredGrade === "C+"){
+      numberGrade = 65;
+    }else if(desiredGrade === "C"){
+      numberGrade = 60;
+    }else if(desiredGrade === "D+"){
+      numberGrade = 55;
+    }else if(desiredGrade === "D"){
+      numberGrade = 50;
+    }else if(desiredGrade === "E"){
+      numberGrade = 40;
+    }else if(desiredGrade === "F"){
+      numberGrade = 39
+    }
+
+    return ((100*numberGrade - parseFloat(this.state.grde)*parseFloat(this.state.cred))/(100-parseFloat(this.state.cred))).toFixed(2) + '%'
+
+  }
+
+  clearAllFields(){
+    let list = [...this.state.list]
+    for (let i=0;i<list.length;i++){
+      if(this.state.gpaConverter){
+        list[i]["Session"] = "";
+        list[i]["Course"] = "";
+        list[i]["Grade"] = "";
+        list[i]["Credits"] = "";
+      }else{
+        list[i]["Grade"] = "";
+        list[i]["Credits"] = "";
+      }
+    }
+    this.setState({list:list});
+    this.updateInput();
+  }
+
   render() {
     return (
       <div className="App">
@@ -344,8 +384,8 @@ class App extends Component {
             If you do end up using this option, please be assured that your username/password is not stored and the session to your york account is discarded after the information is scraped for display on here only.
           </p>
           <YorkInfoModal ref={this.yorkInfoModal} setAlert={this.setAlert} getGrades={this.getGradeListFromYork} show={false} onHide={() => this.yorkInfoModal.current.changeModalState(false)} animation />
-          <div disabled={!this.state.gpaConverter} style={{ display: "inline-flex", padding: "20px" }}>
-            <Button style={{ marginRight: "10px", height: "3%" }} variant="danger" onClick={() => this.showYorkInfoModal()}>Import from York</Button>{' '}
+          <div style={{ display: "inline-flex", padding: "20px" }}>
+            <Button disabled={!this.state.gpaConverter} style={{ marginRight: "10px", height: "3%" }} variant="danger" onClick={() => this.showYorkInfoModal()}>Import from York</Button>{' '}
 
 
             <Files key={this.state.inputKey} className="files-dropzone" onChange={file => { this.loadFile(file[0]) }} onError={err => this.loadFileError(err)} accepts={[".json"]} maxFileSize={500000} minFileSize={0} clickable>
@@ -437,7 +477,7 @@ class App extends Component {
                   </td>
                   {this.state.gpaConverter &&
                     <td>
-                      <Button variant="primary" block onClick={() => this.addItem()}>Add New Row</Button>{' '}
+                      <Button variant="danger" onClick={() => this.clearAllFields()}>Clear All Fields</Button>{' '} <Button variant="primary" onClick={() => this.addItem()}>Add New Row</Button>{' '}
                     </td>}
                 </tr>
               }
@@ -452,11 +492,37 @@ class App extends Component {
                     Max Achievable Grade: {(this.state.cred === "N/A" && this.state.grde === "N/A") || (this.state.cred === 0 || this.state.grde === 0) ? "N/A" : this.calculateMaxGrade() + " / " + this.getletterGrade(this.calculateMaxGrade())}
                   </th>
                 </tr>
-              </thead>}
+                <tr>
+                  <th>
+                    <Form.Label>Desired Grade</Form.Label>
+                    <Form.Control as="select" placeholder="Course Name (Optional)" value={this.state.desiredGrade} onChange={e => this.setState({desiredGrade:e.target.value})}>
+                        <option>Choose Grade</option>
+                        <option>A+</option>
+                        <option>A</option>
+                        <option>B+</option>
+                        <option>B</option>
+                        <option>C+</option>
+                        <option>C</option>
+                        <option>D+</option>
+                        <option>D</option>
+                        <option>E</option>
+                        <option>F</option>
+                      </Form.Control>
+                      
+                </th>
+                  <th style={{verticalAlign: "middle"}}>
+                   Need on Remainder: {(this.state.desiredGrade === "Choose Grade" || this.state.creds === "N/A" || this.state.grde === "N/A") ? "N/A" : this.calculateDesiredGrade() + " / " + this.getletterGrade(this.calculateDesiredGrade())}
+                  </th>
+                </tr>
+              </thead>
+              }
           </Table>
           {!this.state.gpaConverter &&
-            <Button variant="primary" block onClick={() => this.addItem()}>Add New Row</Button>
-          }
+          <div>
+            <Button style={{marginRight: "5px"}} variant="danger" onClick={() => this.clearAllFields()}>Clear All Fields</Button> 
+            <Button variant="primary" onClick={() => this.addItem()}>Add New Row</Button>
+          </div>
+          } 
           <br />
         </div>
       </div>
